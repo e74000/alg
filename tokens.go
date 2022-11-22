@@ -34,6 +34,12 @@ const (
 	TidSub
 	TidMul
 	TidDiv
+	TidGreater
+	TidLess
+	TidGreaterEqual
+	TidLessEqual
+	TidEqual
+	TidNotEqual
 	TidSumSt
 	TidSumEn
 	TidProdSt
@@ -105,6 +111,18 @@ func Tokenise(s string) Tokens {
 			t = append(t, Token{id: TidMul})
 		case "/":
 			t = append(t, Token{id: TidDiv})
+		case ">":
+			t = append(t, Token{id: TidGreater})
+		case "<":
+			t = append(t, Token{id: TidLess})
+		case ">=":
+			t = append(t, Token{id: TidGreaterEqual})
+		case "<=":
+			t = append(t, Token{id: TidLessEqual})
+		case "==":
+			t = append(t, Token{id: TidEqual})
+		case "!=":
+			t = append(t, Token{id: TidNotEqual})
 		default:
 			panic(fmt.Sprintf("ERROR: Unknown token: %s", sub))
 		}
@@ -195,6 +213,48 @@ func (t *Tokens) Parse() Term {
 		return Div{
 			N: t.Parse(),
 			D: t.Parse(),
+		}
+	case TidGreater:
+		return Greater{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
+	case TidLess:
+		return Less{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
+	case TidGreaterEqual:
+		return GreaterEqual{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
+	case TidLessEqual:
+		return LessEqual{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
+	case TidEqual:
+		return Equal{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
+	case TidNotEqual:
+		return NotEqual{
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
 		}
 	case TidSumEn, TidSumSt, TidProdEn, TidProdSt:
 		panic("ERROR: Sum/Prod are currently unsupported while I figure how to make them parse properly...")
