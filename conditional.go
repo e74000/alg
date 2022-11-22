@@ -405,3 +405,76 @@ func (e NotEqual) Tokenise() Tokens {
 	t = append(t, e.Else.Tokenise()...)
 	return t
 }
+
+type Range struct {
+	X, A, B, If, Else Term
+}
+
+func (e Range) E(x float64) float64 {
+	v := e.X.E(x)
+
+	if v >= e.A.E(x) && v <= e.B.E(x) {
+		return e.If.E(x)
+	} else {
+		return e.Else.E(x)
+	}
+}
+
+func (e Range) Dx() Term {
+	return Range{
+		X:    e.X,
+		A:    e.A,
+		B:    e.B,
+		If:   e.If.Dx(),
+		Else: e.Else.Dx(),
+	}.T()
+}
+
+func (e Range) T() Term {
+	xOk, xv := e.X.Is()
+	aOk, av := e.A.Is()
+	bOk, bv := e.B.Is()
+
+	if xOk && aOk && bOk {
+		if xv >= av && xv <= bv {
+			return e.If.T()
+		} else {
+			return e.Else.T()
+		}
+	}
+
+	return Range{
+		X:    e.X.T(),
+		A:    e.A.T(),
+		B:    e.B.T(),
+		If:   e.If.T(),
+		Else: e.Else.T(),
+	}
+}
+
+func (e Range) Is() (bool, float64) {
+	xOk, xv := e.X.Is()
+	aOk, av := e.A.Is()
+	bOk, bv := e.B.Is()
+
+	if xOk && aOk && bOk {
+		if xv >= av && xv <= bv {
+			return e.If.Is()
+		} else {
+			return e.Else.Is()
+		}
+	}
+
+	return false, 0
+}
+
+func (e Range) Tokenise() Tokens {
+	t := Tokens{{id: TidRange}}
+	t = append(t, e.X.Tokenise()...)
+	t = append(t, e.A.Tokenise()...)
+	t = append(t, e.B.Tokenise()...)
+	t = append(t, e.If.Tokenise()...)
+	t = append(t, e.Else.Tokenise()...)
+
+	return t
+}

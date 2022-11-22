@@ -40,6 +40,7 @@ const (
 	TidLessEqual
 	TidEqual
 	TidNotEqual
+	TidRange
 	TidSumSt
 	TidSumEn
 	TidProdSt
