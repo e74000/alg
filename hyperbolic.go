@@ -149,9 +149,10 @@ func (e Coth) E(x float64) float64 {
 }
 
 func (e Coth) Dx() Term {
-	return Mul{
-		A: e.X.Dx(),
-		B: TP{
+	return Prod{
+		S(-1),
+		e.X.Dx(),
+		TP{
 			X: Csch{e.X},
 			P: 2,
 		},
