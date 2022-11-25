@@ -358,6 +358,18 @@ func (t *Tokens) String() string {
 			s += "csc "
 		case TidCot:
 			s += "cot "
+		case TidSinh:
+			s += "sinh "
+		case TidCosh:
+			s += "cosh "
+		case TidTanh:
+			s += "tanh "
+		case TidSech:
+			s += "sech "
+		case TidCsch:
+			s += "csch "
+		case TidCoth:
+			s += "coth "
 		case TidAdd:
 			s += "+ "
 		case TidSub:
@@ -389,7 +401,7 @@ func (t *Tokens) String() string {
 		case TidProdEn:
 			s += "]* "
 		default:
-			panic("ERROR: Unknown token")
+			panic("ERROR: Unknown token when making string")
 		}
 	}
 	return s
