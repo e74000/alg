@@ -67,7 +67,7 @@ func Tokenise(s string) Tokens {
 
 	for _, sub := range split {
 		if sub == "-" || sub == "." || sub == "x" {
-			
+
 		} else if isScalar.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub, 64)
 			if err != nil {
@@ -286,23 +286,37 @@ func (t *Tokens) Parse() Term {
 		}
 	case TidSumSt:
 		sum := make(Sum, 0)
-		for i := 0; i < len(*t); i++ {
+		closed := false
+		for len(*t) != 0 {
 			if (*t)[0].id == TidSumEn {
+				closed = true
 				t.pop()
 			}
 
 			sum = append(sum, t.Parse())
 		}
+
+		if !closed {
+			panic("Unmatched brackets")
+		}
+
 		return sum
 	case TidProdSt:
 		prod := make(Prod, 0)
-		for i := 0; i < len(*t); i++ {
+		closed := false
+		for len(*t) != 0 {
 			if (*t)[0].id == TidProdEn {
+				closed = true
 				t.pop()
 			}
 
 			prod = append(prod, t.Parse())
 		}
+
+		if !closed {
+			panic("Unmatched brackets")
+		}
+
 		return prod
 	case TidSumEn, TidProdEn:
 		panic("Unmatched brackets!")
