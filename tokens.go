@@ -74,6 +74,9 @@ func Tokenise(s string) Tokens {
 
 			t = append(t, Token{id: TidS, val: v})
 			continue
+		} else if sub == "-x" {
+			t = append(t, Token{id: TidSx, val: -1})
+			continue
 		} else if isScalarX.MatchString(sub) && sub != "x" {
 			v, err := strconv.ParseFloat(sub[:len(sub)-1], 64)
 			if err != nil {
