@@ -66,7 +66,9 @@ func Tokenise(s string) Tokens {
 	t := make(Tokens, 0, len(split))
 
 	for _, sub := range split {
-		if isScalar.MatchString(sub) {
+		if sub == "-" || sub == "." || sub == "x" {
+			
+		} else if isScalar.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub, 64)
 			if err != nil {
 				panic(err)
@@ -77,7 +79,7 @@ func Tokenise(s string) Tokens {
 		} else if sub == "-x" {
 			t = append(t, Token{id: TidSx, val: -1})
 			continue
-		} else if isScalarX.MatchString(sub) && sub != "x" && sub != "-" && sub != "." {
+		} else if isScalarX.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub[:len(sub)-1], 64)
 			if err != nil {
 				panic(err)
