@@ -291,6 +291,7 @@ func (t *Tokens) Parse() Term {
 			if (*t)[0].id == TidSumEn {
 				closed = true
 				t.pop()
+				break
 			}
 
 			sum = append(sum, t.Parse())
@@ -308,6 +309,7 @@ func (t *Tokens) Parse() Term {
 			if (*t)[0].id == TidProdEn {
 				closed = true
 				t.pop()
+				break
 			}
 
 			prod = append(prod, t.Parse())
