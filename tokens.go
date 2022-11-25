@@ -59,6 +59,7 @@ var (
 	isScalarX = regexp.MustCompile("^-?\\d*\\.?\\d*x$")
 )
 
+// Tokenise parses a string to a slice of tokens
 func Tokenise(s string) Tokens {
 	split := strings.Split(s, " ")
 
@@ -73,7 +74,7 @@ func Tokenise(s string) Tokens {
 
 			t = append(t, Token{id: TidS, val: v})
 			continue
-		} else if isScalarX.MatchString(sub) {
+		} else if isScalarX.MatchString(sub) && sub != "x" {
 			v, err := strconv.ParseFloat(sub[:len(sub)-1], 64)
 			if err != nil {
 				panic(err)
@@ -124,6 +125,8 @@ func Tokenise(s string) Tokens {
 			t = append(t, Token{id: TidEqual})
 		case "!=":
 			t = append(t, Token{id: TidNotEqual})
+		case "<=>":
+			t = append(t, Token{id: TidRange})
 		default:
 			panic(fmt.Sprintf("ERROR: Unknown token: %s", sub))
 		}
@@ -132,14 +135,17 @@ func Tokenise(s string) Tokens {
 	return t
 }
 
-func (t *Tokens) Pop() Token {
+// pop removes the first element of a token slice
+// It is unexported since it is just a tiny utility function.
+func (t *Tokens) pop() Token {
 	out := (*t)[0]
 	*t = (*t)[1:]
 	return out
 }
 
+// Parse converts a token slice to a tree with prefix notation
 func (t *Tokens) Parse() Term {
-	temp := t.Pop()
+	temp := t.pop()
 
 	switch temp.id {
 	case TidS:
@@ -257,6 +263,14 @@ func (t *Tokens) Parse() Term {
 			If:   t.Parse(),
 			Else: t.Parse(),
 		}
+	case TidRange:
+		return Range{
+			X:    t.Parse(),
+			A:    t.Parse(),
+			B:    t.Parse(),
+			If:   t.Parse(),
+			Else: t.Parse(),
+		}
 	case TidSumEn, TidSumSt, TidProdEn, TidProdSt:
 		panic("ERROR: Sum/Prod are currently unsupported while I figure how to make them parse properly...")
 	}
@@ -265,6 +279,7 @@ func (t *Tokens) Parse() Term {
 	return nil
 }
 
+// String converts a token slice to a string
 func (t *Tokens) String() string {
 	s := ""
 
@@ -302,6 +317,20 @@ func (t *Tokens) String() string {
 			s += "* "
 		case TidDiv:
 			s += "/ "
+		case TidGreater:
+			s += "> "
+		case TidLess:
+			s += "< "
+		case TidGreaterEqual:
+			s += ">= "
+		case TidLessEqual:
+			s += "<= "
+		case TidEqual:
+			s += "== "
+		case TidNotEqual:
+			s += "!= "
+		case TidRange:
+			s += "<=> "
 		default:
 			panic("ERROR: Unknown token")
 		}
