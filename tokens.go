@@ -130,6 +130,14 @@ func Tokenise(s string) Tokens {
 			t = append(t, Token{id: TidNotEqual})
 		case "<=>":
 			t = append(t, Token{id: TidRange})
+		case "+[":
+			t = append(t, Token{id: TidSumSt})
+		case "]+":
+			t = append(t, Token{id: TidSumEn})
+		case "*[":
+			t = append(t, Token{id: TidProdSt})
+		case "]*":
+			t = append(t, Token{id: TidProdEn})
 		default:
 			panic(fmt.Sprintf("ERROR: Unknown token: %s", sub))
 		}
@@ -274,8 +282,28 @@ func (t *Tokens) Parse() Term {
 			If:   t.Parse(),
 			Else: t.Parse(),
 		}
-	case TidSumEn, TidSumSt, TidProdEn, TidProdSt:
-		panic("ERROR: Sum/Prod are currently unsupported while I figure how to make them parse properly...")
+	case TidSumSt:
+		sum := make(Sum, 0)
+		for i := 0; i < len(*t); i++ {
+			if (*t)[0].id == TidSumEn {
+				t.pop()
+			}
+
+			sum = append(sum, t.Parse())
+		}
+		return sum
+	case TidProdSt:
+		prod := make(Prod, 0)
+		for i := 0; i < len(*t); i++ {
+			if (*t)[0].id == TidProdEn {
+				t.pop()
+			}
+
+			prod = append(prod, t.Parse())
+		}
+		return prod
+	case TidSumEn, TidProdEn:
+		panic("Unmatched brackets!")
 	}
 
 	panic("ERROR: Failed to parse token!")
@@ -334,6 +362,14 @@ func (t *Tokens) String() string {
 			s += "!= "
 		case TidRange:
 			s += "<=> "
+		case TidSumSt:
+			s += "+[ "
+		case TidSumEn:
+			s += "]+ "
+		case TidProdSt:
+			s += "*[ "
+		case TidProdEn:
+			s += "]* "
 		default:
 			panic("ERROR: Unknown token")
 		}

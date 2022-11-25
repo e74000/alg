@@ -13,8 +13,15 @@ Arithmetic defines all the simple arithmetic datatypes:
 type Sum []Term
 
 func (e Sum) Tokenise() Tokens {
-	panic("Not implemented!")
-	return nil
+	t := Tokens{{id: TidSumSt}}
+
+	for _, term := range e {
+		t = append(t, term.Tokenise()...)
+	}
+
+	t = append(t, Token{id: TidSumEn})
+
+	return t
 }
 
 func (e Sum) E(x float64) float64 {
@@ -108,8 +115,15 @@ func (e Sum) flatten() Sum {
 type Prod []Term
 
 func (e Prod) Tokenise() Tokens {
-	panic("Not implemented!")
-	return nil
+	t := Tokens{{id: TidProdSt}}
+
+	for _, term := range e {
+		t = append(t, term.Tokenise()...)
+	}
+
+	t = append(t, Token{id: TidProdEn})
+
+	return t
 }
 
 func (e Prod) E(x float64) float64 {
