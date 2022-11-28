@@ -255,8 +255,9 @@ func (e TP) Is() (bool, float64) {
 }
 
 func (e TP) Tokenise() Tokens {
-	t := Tokens{{id: TidTP, val: e.P}}
+	t := Tokens{{id: TidTPT}}
 	t = append(t, e.X.Tokenise()...)
+	t = append(t, Token{id: TidS, val: e.P})
 	return t
 }
 
@@ -301,7 +302,8 @@ func (e PT) Is() (bool, float64) {
 }
 
 func (e PT) Tokenise() Tokens {
-	t := Tokens{{TidPT, e.V}}
+	t := Tokens{{id: TidTPT}}
+	t = append(t, Token{id: TidS, val: e.V})
 	t = append(t, e.X.Tokenise()...)
 	return t
 }

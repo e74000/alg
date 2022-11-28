@@ -2,6 +2,7 @@ package alg
 
 import (
 	"fmt"
+	"github.com/e74000/bimap"
 	"regexp"
 	"strconv"
 	"strings"
@@ -52,6 +53,44 @@ type Token struct {
 	val float64
 }
 
+var mTokenString = map[TokenID]string{
+	TidX:            "x",
+	TidExp:          "e",
+	TidTPT:          "^",
+	TidTP:           "^",
+	TidPT:           "^",
+	TidLn:           "ln",
+	TidSin:          "sin",
+	TidCos:          "cos",
+	TidTan:          "tan",
+	TidSec:          "sec",
+	TidCsc:          "csc",
+	TidCot:          "cot",
+	TidSinh:         "sinh",
+	TidCosh:         "cosh",
+	TidTanh:         "tanh",
+	TidSech:         "sech",
+	TidCsch:         "csch",
+	TidCoth:         "coth",
+	TidAdd:          "+",
+	TidSub:          "-",
+	TidMul:          "*",
+	TidDiv:          "/",
+	TidGreater:      ">",
+	TidLess:         "<",
+	TidGreaterEqual: ">=",
+	TidLessEqual:    "<=",
+	TidEqual:        "==",
+	TidNotEqual:     "!=",
+	TidRange:        "<=>",
+	TidSumSt:        "+[",
+	TidSumEn:        "]+",
+	TidProdSt:       "*[",
+	TidProdEn:       "]*",
+}
+
+var bmTokenString = bimap.MapToBimapOdd(mTokenString)
+
 type Tokens []Token
 
 var (
@@ -89,60 +128,7 @@ func Tokenise(s string) Tokens {
 			continue
 		}
 
-		switch sub {
-		case "x":
-			t = append(t, Token{id: TidX})
-		case "e":
-			t = append(t, Token{id: TidExp})
-		case "^":
-			t = append(t, Token{id: TidTPT})
-		case "ln":
-			t = append(t, Token{id: TidLn})
-		case "sin":
-			t = append(t, Token{id: TidSin})
-		case "cos":
-			t = append(t, Token{id: TidCos})
-		case "tan":
-			t = append(t, Token{id: TidTan})
-		case "sec":
-			t = append(t, Token{id: TidSec})
-		case "csc":
-			t = append(t, Token{id: TidCsc})
-		case "cot":
-			t = append(t, Token{id: TidCot})
-		case "+":
-			t = append(t, Token{id: TidAdd})
-		case "-":
-			t = append(t, Token{id: TidSub})
-		case "*":
-			t = append(t, Token{id: TidMul})
-		case "/":
-			t = append(t, Token{id: TidDiv})
-		case ">":
-			t = append(t, Token{id: TidGreater})
-		case "<":
-			t = append(t, Token{id: TidLess})
-		case ">=":
-			t = append(t, Token{id: TidGreaterEqual})
-		case "<=":
-			t = append(t, Token{id: TidLessEqual})
-		case "==":
-			t = append(t, Token{id: TidEqual})
-		case "!=":
-			t = append(t, Token{id: TidNotEqual})
-		case "<=>":
-			t = append(t, Token{id: TidRange})
-		case "+[":
-			t = append(t, Token{id: TidSumSt})
-		case "]+":
-			t = append(t, Token{id: TidSumEn})
-		case "*[":
-			t = append(t, Token{id: TidProdSt})
-		case "]*":
-			t = append(t, Token{id: TidProdEn})
-		default:
-			panic(fmt.Sprintf("ERROR: Unknown token: %s", sub))
-		}
+		t = append(t, Token{id: bmTokenString.GetRev(sub)})
 	}
 
 	return t
@@ -335,74 +321,14 @@ func (t *Tokens) String() string {
 	for _, token := range *t {
 		switch token.id {
 		case TidS:
-			s += fmt.Sprintf("%.2f ", token.val)
+			s += fmt.Sprintf("%.2f", token.val)
 		case TidSx:
 			s += fmt.Sprintf("%.2fx", token.val)
-		case TidX:
-			s += "x "
-		case TidExp:
-			s += "e "
-		case TidLn:
-			s += "ln "
-		case TidTPT, TidTP, TidPT:
-			s += "^ "
-		case TidSin:
-			s += "sin "
-		case TidCos:
-			s += "cos "
-		case TidTan:
-			s += "tan "
-		case TidSec:
-			s += "sec "
-		case TidCsc:
-			s += "csc "
-		case TidCot:
-			s += "cot "
-		case TidSinh:
-			s += "sinh "
-		case TidCosh:
-			s += "cosh "
-		case TidTanh:
-			s += "tanh "
-		case TidSech:
-			s += "sech "
-		case TidCsch:
-			s += "csch "
-		case TidCoth:
-			s += "coth "
-		case TidAdd:
-			s += "+ "
-		case TidSub:
-			s += "- "
-		case TidMul:
-			s += "* "
-		case TidDiv:
-			s += "/ "
-		case TidGreater:
-			s += "> "
-		case TidLess:
-			s += "< "
-		case TidGreaterEqual:
-			s += ">= "
-		case TidLessEqual:
-			s += "<= "
-		case TidEqual:
-			s += "== "
-		case TidNotEqual:
-			s += "!= "
-		case TidRange:
-			s += "<=> "
-		case TidSumSt:
-			s += "+[ "
-		case TidSumEn:
-			s += "]+ "
-		case TidProdSt:
-			s += "*[ "
-		case TidProdEn:
-			s += "]* "
 		default:
-			panic("ERROR: Unknown token when making string")
+			s += bmTokenString.GetFor(token.id)
 		}
+
+		s += " "
 	}
 	return s
 }
