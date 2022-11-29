@@ -214,7 +214,7 @@ func (t *Tokens) Parse() Term {
 			X: t.Parse(),
 		}
 	case TidSech:
-		return Tanh{
+		return Sech{
 			X: t.Parse(),
 		}
 	case TidCsch:

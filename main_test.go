@@ -38,8 +38,10 @@ func TestTokens_Parse(t *testing.T) {
 		ts := Tokenise(s)
 		tree := ts.Parse()
 
+		trs := tree.Tokenise()
+
 		if !reflect.DeepEqual(term, tree) {
-			t.Logf("Test failed on case: (%s)\nWanted: %v\nGot:    %v\n", s, term, tree)
+			t.Logf("Test failed on case: (%s)Wanted: %v :: (%s)\nGot:    %v :: (%s)\n", s, term, ts.String(), tree, trs.String())
 			t.Fail()
 		}
 	}
