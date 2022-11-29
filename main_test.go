@@ -46,3 +46,34 @@ func TestTokens_Parse(t *testing.T) {
 		}
 	}
 }
+
+func TestTidy(t *testing.T) {
+	messy := []Term{
+		Prod{S(0), Add{S(0), Exp{Sx{-1}}}},
+		Add{Prod{S(0), X{}}, X{}},
+		Prod{Add{S(2), S(1)}},
+		Prod{S(1), S(2), S(3), X{}},
+		Div{Add{Prod{S(0), X{}}, X{}}, Sin{X{}}},
+	}
+
+	tidy := []Term{
+		S(0),
+		X{},
+		S(3),
+		Prod{X{}, S(6)},
+		Div{X{}, Sin{X{}}},
+	}
+
+	for i := 0; i < len(messy); i++ {
+		tidied := messy[i].T()
+
+		ms := messy[i].Tokenise()
+		ns := tidied.Tokenise()
+		ts := tidy[i].Tokenise()
+
+		if !reflect.DeepEqual(tidy[i], tidied) {
+			t.Logf("Test failed on case: (%s)\nWanted: %s\nGot     %s\n", ms.String(), ts.String(), ns.String())
+			t.Fail()
+		}
+	}
+}

@@ -282,7 +282,10 @@ func (e Div) T() Term {
 		return Prod{e.N, S(1 / dVal)}
 	}
 
-	return e
+	return Div{
+		N: e.N.T(),
+		D: e.D.T(),
+	}
 }
 
 func (e Div) Is() (bool, float64) {
