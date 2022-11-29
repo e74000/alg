@@ -31,6 +31,7 @@ func TestTokens_Parse(t *testing.T) {
 		"^ 2.00 x":                      TPT{A: S(2), B: X{}},
 		"sin sin x":                     Sin{X: Sin{X: X{}}},
 		"+[ * 1.00 2.00 + 3.00 4.00 ]+": Sum{Mul{A: S(1), B: S(2)}, Add{A: S(3), B: S(4)}},
+		"^ sech x 2":                    TPT{A: Sech{X{}}, B: S(2)},
 	}
 
 	for s, term := range testCases {

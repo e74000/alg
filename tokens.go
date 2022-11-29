@@ -143,6 +143,7 @@ func (t *Tokens) pop() Token {
 }
 
 // Parse converts a token slice to a tree with prefix notation
+// It would be better if this could be achieved without an endless switch statement, however I am not sure how to implement this.
 func (t *Tokens) Parse() Term {
 	temp := t.pop()
 
@@ -198,6 +199,30 @@ func (t *Tokens) Parse() Term {
 		}
 	case TidCot:
 		return Cot{
+			X: t.Parse(),
+		}
+	case TidCosh:
+		return Cosh{
+			X: t.Parse(),
+		}
+	case TidSinh:
+		return Sinh{
+			X: t.Parse(),
+		}
+	case TidTanh:
+		return Tanh{
+			X: t.Parse(),
+		}
+	case TidSech:
+		return Tanh{
+			X: t.Parse(),
+		}
+	case TidCsch:
+		return Csch{
+			X: t.Parse(),
+		}
+	case TidCoth:
+		return Coth{
 			X: t.Parse(),
 		}
 	case TidAdd:
