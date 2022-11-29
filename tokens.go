@@ -57,8 +57,6 @@ var mTokenString = map[TokenID]string{
 	TidX:            "x",
 	TidExp:          "e",
 	TidTPT:          "^",
-	TidTP:           "^",
-	TidPT:           "^",
 	TidLn:           "ln",
 	TidSin:          "sin",
 	TidCos:          "cos",
@@ -89,7 +87,7 @@ var mTokenString = map[TokenID]string{
 	TidProdEn:       "]*",
 }
 
-var bmTokenString = bimap.MapToBimapOdd(mTokenString)
+var bmTokenString = bimap.MapToBimap(mTokenString)
 
 type Tokens []Token
 
@@ -105,7 +103,9 @@ func Tokenise(s string) Tokens {
 	t := make(Tokens, 0, len(split))
 
 	for _, sub := range split {
-		if sub == "-" || sub == "." || sub == "x" {
+		if sub == "" {
+			continue
+		} else if sub == "-" || sub == "." || sub == "x" {
 
 		} else if isScalar.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub, 64)
