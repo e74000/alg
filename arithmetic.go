@@ -44,6 +44,7 @@ func (e Sum) Dx() Term {
 
 func (e Sum) T() Term {
 	flat := e.flatten()
+
 	sum := make(Sum, 0, len(flat))
 
 	var total float64
@@ -62,6 +63,15 @@ func (e Sum) T() Term {
 
 	if total != 0 {
 		sum = append(sum, S(total))
+	}
+
+	if len(sum) == 1 {
+		return sum[0].T()
+	} else if len(sum) == 2 {
+		return Add{
+			A: sum[0],
+			B: sum[1],
+		}
 	}
 
 	return sum
@@ -180,6 +190,15 @@ func (e Prod) T() Term {
 
 	if total != 1 {
 		prod = append(prod, S(total))
+	}
+
+	if len(prod) == 1 {
+		return prod[0].T()
+	} else if len(prod) == 2 {
+		return Mul{
+			A: prod[0],
+			B: prod[1],
+		}
 	}
 
 	return prod

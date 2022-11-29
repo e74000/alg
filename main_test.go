@@ -52,16 +52,18 @@ func TestTidy(t *testing.T) {
 		Prod{S(0), Add{S(0), Exp{Sx{-1}}}},
 		Add{Prod{S(0), X{}}, X{}},
 		Prod{Add{S(2), S(1)}},
-		Prod{S(1), S(2), S(3), X{}},
+		Prod{S(1), S(2), S(3), X{}, X{}},
 		Div{Add{Prod{S(0), X{}}, X{}}, Sin{X{}}},
+		Prod{X{}, X{}},
 	}
 
 	tidy := []Term{
 		S(0),
 		X{},
 		S(3),
-		Prod{X{}, S(6)},
+		Prod{X{}, X{}, S(6)},
 		Div{X{}, Sin{X{}}},
+		Mul{X{}, X{}},
 	}
 
 	for i := 0; i < len(messy); i++ {
@@ -75,5 +77,25 @@ func TestTidy(t *testing.T) {
 			t.Logf("Test failed on case: (%s)\nWanted: %s\nGot     %s\n", ms.String(), ts.String(), ns.String())
 			t.Fail()
 		}
+	}
+}
+
+func TestSigmoid(t *testing.T) {
+	sigmoid := Div{S(1), Add{S(1), Exp{Sx{-1}}}}
+	prime := sigmoid.Dx()
+	pTrue := Div{
+		N: Exp{Sx{-1}},
+		D: Mul{
+			A: Add{S(1), Exp{Sx{-1}}},
+			B: Add{S(1), Exp{Sx{-1}}},
+		},
+	}
+
+	if !reflect.DeepEqual(prime, pTrue) {
+		pts := prime.Tokenise()
+		tts := pTrue.Tokenise()
+
+		t.Logf("Sigmoid derivative has failed!\n %s != %s\n", pts.String(), tts.String())
+		t.Fail()
 	}
 }
