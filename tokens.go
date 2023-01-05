@@ -1,6 +1,7 @@
 package alg
 
 import (
+	"errors"
 	"fmt"
 	"github.com/e74000/bimap"
 	"regexp"
@@ -97,7 +98,7 @@ var (
 )
 
 // Tokenise parses a string to a slice of tokens
-func Tokenise(s string) Tokens {
+func Tokenise(s string) (Tokens, error) {
 	split := strings.Split(s, " ")
 
 	t := make(Tokens, 0, len(split))
@@ -110,7 +111,7 @@ func Tokenise(s string) Tokens {
 		} else if isScalar.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub, 64)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 
 			t = append(t, Token{id: TidS, val: v})
@@ -121,7 +122,7 @@ func Tokenise(s string) Tokens {
 		} else if isScalarX.MatchString(sub) {
 			v, err := strconv.ParseFloat(sub[:len(sub)-1], 64)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 
 			t = append(t, Token{id: TidSx, val: v})
@@ -131,7 +132,7 @@ func Tokenise(s string) Tokens {
 		t = append(t, Token{id: bmTokenString.GetRev(sub)})
 	}
 
-	return t
+	return t, nil
 }
 
 // pop removes the first element of a token slice
@@ -143,158 +144,378 @@ func (t *Tokens) pop() Token {
 }
 
 // Parse converts a token slice to a tree with prefix notation
-// It would be better if this could be achieved without an endless switch statement, however I am not sure how to implement this.
-func (t *Tokens) Parse() Term {
+// This is a massive automatically-ish generated switch statement - I would rather if it could be avoided, but I can't figure out any better methods right now...
+func (t *Tokens) Parse() (Term, error) {
 	temp := t.pop()
 
 	switch temp.id {
 	case TidS:
-		return S(temp.val)
+		return S(temp.val), nil
 	case TidX:
-		return X{}
+		return X{}, nil
 	case TidSx:
-		return Sx{temp.val}
+		return Sx{temp.val}, nil
 	case TidExp:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Exp{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidLn:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Ln{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidTPT:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return TPT{
-			A: t.Parse(),
-			B: t.Parse(),
-		}
+			A: arg1,
+			B: arg2,
+		}, nil
 	case TidTP:
-		return TP{
-			X: t.Parse(),
-			P: temp.val,
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
 		}
+		return TP{
+			X: arg1,
+			P: temp.val,
+		}, nil
 	case TidPT:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return PT{
 			V: temp.val,
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidSin:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Sin{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCos:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Cos{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidTan:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Tan{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidSec:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Sec{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCsc:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Csc{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCot:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Cot{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCosh:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Cosh{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidSinh:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Sinh{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidTanh:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Tanh{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidSech:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Sech{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCsch:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Csch{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidCoth:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Coth{
-			X: t.Parse(),
-		}
+			X: arg1,
+		}, nil
 	case TidAdd:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Add{
-			A: t.Parse(),
-			B: t.Parse(),
-		}
+			A: arg1,
+			B: arg2,
+		}, nil
 	case TidSub:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Sub{
-			A: t.Parse(),
-			B: t.Parse(),
-		}
+			A: arg1,
+			B: arg2,
+		}, nil
 	case TidMul:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Mul{
-			A: t.Parse(),
-			B: t.Parse(),
-		}
+			A: arg1,
+			B: arg2,
+		}, nil
 	case TidDiv:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Div{
-			N: t.Parse(),
-			D: t.Parse(),
-		}
+			N: arg1,
+			D: arg2,
+		}, nil
 	case TidGreater:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Greater{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidLess:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Less{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidGreaterEqual:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return GreaterEqual{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidLessEqual:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return LessEqual{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidEqual:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return Equal{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidNotEqual:
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
 		return NotEqual{
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
-		}
+			A:    arg1,
+			B:    arg2,
+			If:   arg3,
+			Else: arg4,
+		}, nil
 	case TidRange:
-		return Range{
-			X:    t.Parse(),
-			A:    t.Parse(),
-			B:    t.Parse(),
-			If:   t.Parse(),
-			Else: t.Parse(),
+		arg1, err := t.Parse()
+		if err != nil {
+			return nil, err
 		}
+		arg2, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg3, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg4, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		arg5, err := t.Parse()
+		if err != nil {
+			return nil, err
+		}
+		return Range{
+			X:    arg1,
+			A:    arg2,
+			B:    arg3,
+			If:   arg4,
+			Else: arg5,
+		}, nil
 	case TidSumSt:
 		sum := make(Sum, 0)
 		closed := false
@@ -305,14 +526,19 @@ func (t *Tokens) Parse() Term {
 				break
 			}
 
-			sum = append(sum, t.Parse())
+			arg, err := t.Parse()
+			if err != nil {
+				return nil, err
+			}
+
+			sum = append(sum, arg)
 		}
 
 		if !closed {
-			panic("Unmatched brackets")
+			return nil, errors.New("unmatched brackets")
 		}
 
-		return sum
+		return sum, nil
 	case TidProdSt:
 		prod := make(Prod, 0)
 		closed := false
@@ -323,20 +549,24 @@ func (t *Tokens) Parse() Term {
 				break
 			}
 
-			prod = append(prod, t.Parse())
+			arg, err := t.Parse()
+			if arg != nil {
+				return nil, err
+			}
+
+			prod = append(prod, arg)
 		}
 
 		if !closed {
-			panic("Unmatched brackets")
+			return nil, errors.New("unmatched brackets")
 		}
 
-		return prod
+		return prod, nil
 	case TidSumEn, TidProdEn:
-		panic("Unmatched brackets!")
+		return nil, errors.New("unmatched brackets")
 	}
 
-	panic("ERROR: Failed to parse token!")
-	return nil
+	return nil, errors.New("failed to parse token")
 }
 
 // String converts a token slice to a string
