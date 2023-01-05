@@ -146,6 +146,10 @@ func (t *Tokens) pop() Token {
 // Parse converts a token slice to a tree with prefix notation
 // This is a massive automatically-ish generated switch statement - I would rather if it could be avoided, but I can't figure out any better methods right now...
 func (t *Tokens) Parse() (Term, error) {
+	if len(*t) == 0 {
+		return nil, errors.New("tokens ended unexpectedly")
+	}
+
 	temp := t.pop()
 
 	switch temp.id {
